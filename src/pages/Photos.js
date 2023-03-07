@@ -16,6 +16,7 @@ const Photos = () => {
             imgUrl={photo.url}
             favorite={photo.isFavorite}
             id={photo.id}
+            photo={photo}
           />
         );
       })}

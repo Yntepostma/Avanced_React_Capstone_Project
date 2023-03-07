@@ -5,9 +5,6 @@ const Context = createContext();
 
 const ContextProvider = ({ children }) => {
   const [photos, setPhotos] = useState([]);
-
-  console.log("photos", photos);
-
   const getPhotos = async () => {
     try {
       const response = await axios.get(
@@ -19,33 +16,45 @@ const ContextProvider = ({ children }) => {
     }
   };
 
+  console.log(photos);
+
   useEffect(() => {
     getPhotos();
   }, []);
 
   const toggleFavorite = (id) => {
-    const newArray = photos?.map((photo) => {
+    const newArray = photos.map((photo) => {
       if (photo.id === id) {
         return { ...photo, isFavorite: !photo.isFavorite };
       } else {
         return photo;
       }
     });
-
     setPhotos(newArray);
   };
 
   const [cartItems, setCartItems] = useState([]);
 
-  const addItem = (id) => {
-    const item = photos?.find((photo) => {
-      return photo.id === id;
-    });
-    setCartItems([...cartItems, item]);
+  const addItem = (photo) => {
+    const copyArr = cartItems;
+    setCartItems([...copyArr, photo]);
+  };
+
+  const removeItem = (id) => {
+    setCartItems(cartItems.filter((p) => id !== p.id));
   };
 
   return (
-    <Context.Provider value={{ photos, toggleFavorite, addItem }}>
+    <Context.Provider
+      value={{
+        photos,
+        toggleFavorite,
+        addItem,
+        cartItems,
+        removeItem,
+        setCartItems,
+      }}
+    >
       {children}
     </Context.Provider>
   );

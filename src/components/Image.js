@@ -1,35 +1,16 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import PropTypes from "prop-types";
+import useHover from "../hooks/useHover";
 import { Context } from "./Context";
 import "../styles.css";
 
-const Image = ({ className, imgUrl, id, favorite }) => {
-  const [hover, setHover] = useState(false);
-  const { toggleFavorite, addItem } = useContext(Context);
-
-  const handleMouseEnter = () => {
-    setHover(true);
-  };
-
-  const handleMouseLeave = () => {
-    setHover(false);
-  };
+const Image = ({ className, imgUrl, id, favorite, photo }) => {
+  const [hover, ref] = useHover();
+  const { toggleFavorite, addItem, cartItems, removeItem } =
+    useContext(Context);
 
   const heartIcon = () => {
-    if (favorite && hover) {
-      return (
-        <>
-          <i
-            onClick={() => toggleFavorite(id)}
-            className="ri-heart-fill favorite"
-          ></i>
-          <i
-            onClick={() => addItem(id)}
-            className="ri-add-circle-line cart"
-          ></i>
-        </>
-      );
-    } else if (favorite) {
+    if (favorite) {
       return (
         <i
           onClick={() => toggleFavorite(id)}
@@ -38,28 +19,38 @@ const Image = ({ className, imgUrl, id, favorite }) => {
       );
     } else if (hover) {
       return (
-        <>
-          <i
-            onClick={() => toggleFavorite(id)}
-            className="ri-heart-line favorite"
-          ></i>
-          <i
-            onClick={() => addItem(id)}
-            className="ri-add-circle-line cart"
-          ></i>
-        </>
+        <i
+          onClick={() => toggleFavorite(id)}
+          className="ri-heart-line favorite"
+        ></i>
+      );
+    }
+  };
+
+  const cartIcon = () => {
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      return (
+        <i
+          className="ri-shopping-cart-fill cart"
+          onClick={() => removeItem(id)}
+        ></i>
+      );
+    } else if (hover) {
+      return (
+        <i
+          className="ri-add-circle-line cart"
+          onClick={() => addItem(photo)}
+        ></i>
       );
     }
   };
 
   return (
-    <div
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={`${className} image-container`}
-    >
+    <div ref={ref} className={`${className} image-container`}>
       <img src={imgUrl} className={"image-grid"} alt="Photo" />
       {heartIcon()}
+      {cartIcon()}
     </div>
   );
 };
